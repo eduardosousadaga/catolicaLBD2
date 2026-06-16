@@ -1,0 +1,2 @@
+# 🐾 VetCare (VetSys) - Gestão Veterinária Avançada
+Projeto de banco de dados relacional (MySQL) integrado a uma API Node.js para o gerenciamento seguro e otimizado de uma clínica veterinária. Trabalho desenvolvido para a disciplina de Laboratório de Banco de Dados, demonstrando a aplicação prática de Triggers, Views, Stored Procedures, Índices B-Tree e segurança baseada no princípio do menor privilégio.
