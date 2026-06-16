@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VetSys - Gestão Veterinária Avançada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIÁVEIS DE TEMA (CLARO) ===== */
+        :root {
+            --primary: #0ea5e9;
+            --primary-hover: #0284c7;
+            --secondary: #8b5cf6;
+            --bg-color: #f8fafc;
+            --surface: #ffffff;
+            --surface-hover: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --success: #10b981;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glow-1: rgba(14, 165, 233, 0.15);
+            --glow-2: rgba(139, 92, 246, 0.15);
+        }
+
+        /* ===== VARIÁVEIS DE TEMA (ESCURO) ===== */
+        [data-theme="dark"] {
+            --primary: #38bdf8;
+            --primary-hover: #0ea5e9;
+            --secondary: #a78bfa;
+            --bg-color: #0f172a;
+            --surface: #1e293b;
+            --surface-hover: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            --glass-bg: rgba(30, 41, 59, 0.85);
+            --glow-1: rgba(56, 189, 248, 0.08);
+            --glow-2: rgba(167, 139, 250, 0.08);
+        }
+
+        /* ===== RESET E BASE ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== EFEITOS LUMINOSOS ===== */
+        .bg-glow-1 { position: fixed; top: -15%; left: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--glow-1) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; z-index: -1; pointer-events: none; }
+        .bg-glow-2 { position: fixed; bottom: -15%; right: -10%; width: 60vw; height: 60vw; background: radial-gradient(circle, var(--glow-2) 0%, rgba(0,0,0,0) 70%); border-radius: 50%; z-index: -1; pointer-events: none; }
+
+        /* ===== NAVBAR ===== */
+        .navbar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 70px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-right { display: flex; align-items: center; }
+        .nav-links { display: none; align-items: center; }
+
+        .navbar a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 10px 16px;
+            margin: 0 4px;
+            font-weight: 500;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        .navbar a:hover { color: var(--primary); background: var(--surface-hover); }
+        .navbar a.btn-logout { color: var(--danger); font-weight: 600; margin-left: 12px; background: rgba(239, 68, 68, 0.1); }
+        .navbar a.btn-logout:hover { background: rgba(239, 68, 68, 0.2); }
+
+        .theme-toggle {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-left: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .theme-toggle:hover { background: var(--surface-hover); border-color: var(--primary); transform: translateY(-1px); }
+
+        /* ===== CONTAINER E CAIXAS ===== */
+        .main-content {
+            flex: 1;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .box {
+            background: var(--surface);
+            padding: 48px;
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 900px;
+            display: none;
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .box.active { display: block; }
+        .auth-box { max-width: 440px; margin: auto; position: relative; z-index: 10; }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== TIPOGRAFIA ===== */
+        .gradient-title {
+            text-align: center;
+            margin-bottom: 8px;
+            font-weight: 800;
+            font-size: 32px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 { text-align: center; color: var(--text-main); margin-bottom: 8px; font-weight: 700; font-size: 28px; letter-spacing: -0.5px; }
+        p.subtitle { text-align: center; color: var(--text-muted); font-size: 15px; margin-bottom: 36px; }
+
+        /* ===== FORMULÁRIOS ===== */
+        .input-group { margin-bottom: 20px; }
+        input, select {
+            width: 100%; padding: 16px 18px; border: 2px solid var(--border); border-radius: 12px;
+            font-size: 15px; font-weight: 500; color: var(--text-main); background-color: var(--bg-color); outline: none;
+        }
+        input::placeholder { color: var(--text-muted); font-weight: 400; }
+        input:focus, select:focus { background-color: var(--surface); border-color: var(--primary); box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.15); }
+
+        /* ===== BOTÕES ===== */
+        button { transition: all 0.2s ease; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+        button.btn-primary {
+            width: 100%; padding: 18px; background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #ffffff; border: none; border-radius: 12px; font-size: 16px; font-weight: 700;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); margin-top: 8px; letter-spacing: 0.5px;
+        }
+        button.btn-primary:not(:disabled):hover { box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4); transform: translateY(-2px); }
+
+        button.btn-inline {
+            width: auto; padding: 12px 24px; margin-bottom: 24px; background: var(--surface);
+            color: var(--text-main); border: 1px solid var(--border); box-shadow: var(--shadow-sm);
+            font-weight: 600; border-radius: 10px; cursor: pointer;
+        }
+        button.btn-inline:not(:disabled):hover { background: var(--surface-hover); border-color: var(--primary); }
+
+        /* ===== LINKS DE RODAPÉ ===== */
+        .toggle-link { text-align: center; font-size: 14px; color: var(--text-muted); cursor: pointer; margin-top: 28px; font-weight: 500; }
+        .toggle-link span { color: var(--primary); font-weight: 700; }
+        .toggle-link:hover span { text-decoration: underline; }
+
+        .msg {
+            text-align: center; font-weight: 600; margin-top: 20px; font-size: 14px;
+            border-radius: 10px; padding: 12px; display: none; animation: slideUpFade 0.3s ease;
+        }
+
+        /* ===== TABELAS ===== */
+        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 18px 24px; border-bottom: 1px solid var(--border); font-size: 15px; }
+        th { background: var(--bg-color); font-weight: 600; color: var(--text-muted); text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px; }
+        tbody tr:hover { background: var(--surface-hover); }
+        tbody tr:last-child td { border-bottom: none; }
+        
+        .badge { background: rgba(14, 165, 233, 0.1); color: var(--primary); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; }
+    </style>
+</head>
+<body>
+
+<script>
+    const savedTheme = localStorage.getItem('vetsys_theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+</script>
+
+<div class="bg-glow-1"></div>
+<div class="bg-glow-2"></div>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <div class="logo">🐾 VetSys</div>
+        <div class="nav-right">
+            <div class="nav-links" id="navLinksMenu">
+                <a onclick="showSection('pacientesBox')">Pacientes</a>
+                <a onclick="showSection('relatoriosBox')">Relatório</a>
+                <a onclick="showSection('auditoriaBox')">Auditoria</a>
+                <a onclick="fazerLogout()" class="btn-logout">Sair</a>
+            </div>
+            <button class="theme-toggle" onclick="toggleTheme()" id="btnTheme">
+                <span id="themeIcon">🌙</span> Tema
+            </button>
+        </div>
+    </div>
+</nav>
+
+<div class="main-content">
+    
+    <div class="box auth-box active" id="loginBox">
+        <h2 class="gradient-title">Bem-vindo(a)</h2>
+        <p class="subtitle">Acesse a plataforma VetSys</p>
+        <div class="input-group"><input type="email" id="loginEmail" placeholder="E-mail profissional" required></div>
+        <div class="input-group"><input type="password" id="loginSenha" placeholder="Senha" required></div>
+        <button class="btn-primary" id="btnLogin" onclick="efetuarLogin()">Acessar Sistema</button>
+        <div class="toggle-link" onclick="toggleAuth('registerBox')">Novo colaborador? <span>Crie sua conta</span></div>
+        <div class="msg" id="loginMsg"></div>
+    </div>
+
+    <div class="box auth-box" id="registerBox">
+        <h2 class="gradient-title">Criar Conta</h2>
+        <p class="subtitle">Cadastre um novo membro da equipe</p>
+        <div class="input-group"><input type="text" id="regNome" placeholder="Nome Completo" required></div>
+        <div class="input-group"><input type="email" id="regEmail" placeholder="E-mail profissional" required></div>
+        <div class="input-group"><input type="password" id="regSenha" placeholder="Senha segura" required></div>
+        <div class="input-group">
+            <select id="regGrupo"><option value="2">Perfil: Operador (Recepção)</option><option value="1">Perfil: Administrador (Gerência)</option></select>
+        </div>
+        <button class="btn-primary" id="btnRegister" onclick="efetuarCadastro()">Finalizar Cadastro</button>
+        <div class="toggle-link" onclick="toggleAuth('loginBox')">Já tem acesso? <span>Faça Login</span></div>
+        <div class="msg" id="regMsg"></div>
+    </div>
+
+    <div class="box" id="pacientesBox">
+        <h2>Prontuário de Entrada</h2>
+        <p class="subtitle">Registre ou atualize os dados do paciente</p>
+        <form id="formOperacional" onsubmit="processarOperacao(event)">
+            <input type="hidden" id="opId">
+            <div class="input-group"><input type="text" id="opNome" placeholder="Nome do Animal (Ex: Rex, Luna)" required></div>
+            <div class="input-group"><input type="text" id="opEspecie" placeholder="Espécie (Ex: Canina, Felina)" required></div>
+            <div class="input-group"><input type="text" id="opRaca" placeholder="Raça ou Mestiço"></div>
+            <div class="input-group"><input type="number" id="opIdade" placeholder="Idade Estimada (Anos)" required></div>
+            <button type="submit" class="btn-primary" id="btnSalvar">Salvar Prontuário Clínico</button>
+        </form>
+        <div class="msg" id="opMsg"></div>
+    </div>
+
+    <div class="box" id="relatoriosBox">
+        <h2>Monitoramento de Ações</h2>
+        <p class="subtitle">Registro de navegação e operação da equipe</p>
+        <button class="btn-inline" id="btnSyncRelatorios" onclick="carregarRelatorios()">↻ Sincronizar Dados</button>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Colaborador</th><th>Nível de Acesso</th><th>Ação Registrada</th><th>Data e Hora</th></tr></thead>
+                <tbody id="relatoriosBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box" id="auditoriaBox">
+        <h2>Auditoria de Banco de Dados</h2>
+        <p class="subtitle">Rastreamento de Triggers (Nível SGBD)</p>
+        <button class="btn-inline" id="btnSyncAuditoria" onclick="carregarLogs()">↻ Sincronizar Logs</button>
+        <div class="table-wrapper">
+            <table>
+                <thead><tr><th>Identificação</th><th>Evento Tático</th><th>Detalhes da Modificação</th><th>Data e Hora</th></tr></thead>
+                <tbody id="logsBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:3000/api';
+
+    // ===== LÓGICA DO TEMA ESCURO =====
+    function atualizarIconeTema(theme) {
+        document.getElementById('themeIcon').innerText = theme === 'dark' ? '☀️' : '🌙';
+    }
+    atualizarIconeTema(savedTheme);
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('vetsys_theme', next);
+        atualizarIconeTema(next);
+    }
+
+    // ===== FUNÇÕES DE MENSAGEM =====
+    function mostrarMensagem(elementoId, sucesso, texto) {
+        const el = document.getElementById(elementoId);
+        el.style.display = 'block';
+        el.style.backgroundColor = sucesso ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+        el.style.color = sucesso ? 'var(--success)' : 'var(--danger)';
+        el.innerText = texto;
+        if(sucesso) setTimeout(() => { el.style.display = 'none'; }, 3000);
+    }
+
+    // ===== NAVEGAÇÃO E LOGOUT =====
+    function toggleAuth(boxId) {
+        document.querySelectorAll('.msg').forEach(el => el.style.display = 'none');
+        document.querySelectorAll('.box').forEach(el => el.classList.remove('active'));
+        document.getElementById(boxId).classList.add('active');
+        document.querySelector('.main-content').style.alignItems = 'center';
+    }
+
+    function showSection(sectionId) {
+        document.querySelectorAll('.box').forEach(el => el.classList.remove('active'));
+        document.getElementById(sectionId).classList.add('active');
+        document.querySelector('.main-content').style.alignItems = 'flex-start';
+        if(sectionId === 'relatoriosBox') carregarRelatorios();
+        if(sectionId === 'auditoriaBox') carregarLogs();
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('usuario_logado');
+        document.getElementById('navLinksMenu').style.display = 'none';
+        toggleAuth('loginBox');
+    }
+
+    window.onload = () => {
+        const user = localStorage.getItem('usuario_logado');
+        if(user) {
+            document.getElementById('navLinksMenu').style.display = 'flex';
+            showSection('pacientesBox');
+        }
+    };
+
+    // ===== INTEGRAÇÕES COM BACKEND =====
+    async function efetuarLogin() {
+        const email = document.getElementById('loginEmail').value;
+        const senha = document.getElementById('loginSenha').value;
+        const btn = document.getElementById('btnLogin');
+        btn.innerText = '⏳ Conectando...'; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, senha }) });
+            const data = await res.json();
+            if (res.ok) {
+                localStorage.setItem('usuario_logado', JSON.stringify(data.user));
+                document.getElementById('navLinksMenu').style.display = 'flex';
+                showSection('pacientesBox');
+                document.getElementById('loginMsg').style.display = 'none';
+            } else {
+                mostrarMensagem('loginMsg', false, data.error);
+            }
+        } catch(e) {
+            mostrarMensagem('loginMsg', false, 'Erro de conexão com o servidor.');
+        } finally {
+            btn.innerText = 'Acessar Sistema'; btn.disabled = false;
+        }
+    }
+
+    async function efetuarCadastro() {
+        const nome = document.getElementById('regNome').value, email = document.getElementById('regEmail').value, senha = document.getElementById('regSenha').value, id_grupo = document.getElementById('regGrupo').value;
+        const btn = document.getElementById('btnRegister');
+        btn.innerText = '⏳ Criando Conta...'; btn.disabled = true;
+
+        try {
+            const res = await fetch(`${API_URL}/auth/register`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nome, email, senha, id_grupo }) });
+            const data = await res.json();
+            mostrarMensagem('regMsg', res.ok, res.ok ? data.message : data.error);
+            if(res.ok) setTimeout(() => toggleAuth('loginBox'), 1500);
+        } catch(e) {
+            mostrarMensagem('regMsg', false, 'Erro de conexão com o servidor.');
+        } finally {
+            btn.innerText = 'Finalizar Cadastro'; btn.disabled = false;
+        }
+    }
+
+    async function processarOperacao(event) {
+        event.preventDefault();
+        const user = JSON.parse(localStorage.getItem('usuario_logado'));
+        if (!user) return alert("Erro de sessão.");
+        
+        const btn = document.getElementById('btnSalvar');
+        btn.innerText = '⏳ Salvando...'; btn.disabled = true;
+
+        const payload = { id_paciente: document.getElementById('opId').value, nome_animal: document.getElementById('opNome').value, especie: document.getElementById('opEspecie').value, raca: document.getElementById('opRaca').value, idade_estimada: document.getElementById('opIdade').value, id_usuario: user.id_usuario };
+        try {
+            const res = await fetch(`${API_URL}/pacientes/salvar`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            const data = await res.json();
+            mostrarMensagem('opMsg', res.ok, res.ok ? data.message : data.error);
+            if(res.ok) document.getElementById('formOperacional').reset();
+        } catch(e) {
+            mostrarMensagem('opMsg', false, 'Erro de conexão com o servidor.');
+        } finally {
+            btn.innerText = 'Salvar Prontuário Clínico'; btn.disabled = false;
+        }
+    }
+
+    async function carregarRelatorios() {
+        const btn = document.getElementById('btnSyncRelatorios');
+        btn.innerText = '⏳ Sincronizando...'; btn.disabled = true;
+
+        // Atraso artificial de 800ms para criar a sensação de "loading" no clique
+        await new Promise(r => setTimeout(r, 800));
+
+        try {
+            const res = await fetch(`${API_URL}/relatorios/performance`);
+            const data = await res.json();
+            const tbody = document.getElementById('relatoriosBody');
+            tbody.innerHTML = '';
+            data.forEach(rel => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${rel.nome_usuario}</strong><br><small style="color:var(--text-muted)">${rel.email_usuario}</small></td>
+                    <td><span class="badge">${rel.perfil_acesso}</span></td>
+                    <td>${rel.acao_realizada}</td>
+                    <td style="color:var(--text-muted)">${new Date(rel.data_acao).toLocaleString()}</td>
+                </tr>`;
+            });
+        } catch(e) {
+            console.error(e);
+        } finally {
+            btn.innerText = '↻ Sincronizar Dados'; btn.disabled = false;
+        }
+    }
+
+    async function carregarLogs() {
+        const btn = document.getElementById('btnSyncAuditoria');
+        btn.innerText = '⏳ Sincronizando...'; btn.disabled = true;
+
+        // Atraso artificial de 800ms para criar a sensação de "loading" no clique
+        await new Promise(r => setTimeout(r, 800));
+
+        try {
+            const res = await fetch(`${API_URL}/logs`);
+            const data = await res.json();
+            const tbody = document.getElementById('logsBody');
+            tbody.innerHTML = '';
+            data.forEach(log => {
+                tbody.innerHTML += `<tr>
+                    <td><strong>${log.nome}</strong></td>
+                    <td><span class="badge" style="background:rgba(239, 68, 68, 0.1); color:var(--danger)">${log.acao}</span></td>
+                    <td>${log.descricao}</td>
+                    <td style="color:var(--text-muted)">${new Date(log.data_log).toLocaleString()}</td>
+                </tr>`;
+            });
+        } catch(e) {
+            console.error(e);
+        } finally {
+            btn.innerText = '↻ Sincronizar Logs'; btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
